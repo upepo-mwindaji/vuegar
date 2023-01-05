@@ -1,20 +1,12 @@
-/**
- * main.ts
- *
- * Bootstraps Vuetify and other plugins then mounts the App`
- */
-
-// Components
 import App from './App.vue'
-
-// Composables
 import { createApp } from 'vue'
+import router from '@/router'
+import PrimeVue from 'primevue/config'
 
-// Plugins
-import { registerPlugins } from '@/plugins'
+import '@/assets/main.css'
 
 const app = createApp(App)
-
-registerPlugins(app)
+app.use(PrimeVue)
+app.use(router)
 
 app.mount('#app')

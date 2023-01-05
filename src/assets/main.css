@@ -1,0 +1,16 @@
+@import "ress/dist/ress.min.css";
+@import "primevue/resources/themes/md-light-indigo/theme.css";
+@import "primevue/resources/primevue.min.css";
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+@font-face {
+    font-family: "Roboto";
+    font-weight: 300;
+    font-style: normal;
+    font-display: auto;
+    unicode-range: U+000-5FF;
+    src: local("Roboto"), url("/fonts/Roboto/Roboto-Regular.ttf") format("ttf");
+}
+
+

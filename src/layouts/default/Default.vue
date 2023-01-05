@@ -1,16 +1,19 @@
 <template>
-  <v-app>
-    <v-app-bar color="primary">
-      <v-app-bar-title> VUEGAR DEMO </v-app-bar-title>
-      <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>mdi-github</v-icon>
-      </v-btn>
-    </v-app-bar>
-    <default-view />
-  </v-app>
+  <div style="font-family: Roboto;">
+    <header>
+      <Menubar class="bg-primary" :model="items">
+        <template #start> VUEBAR DEMO </template>
+        <template #end>
+          <i class="pi pi-github"></i>
+        </template>
+      </Menubar>
+    </header>
+    <v-main>
+      <router-view />
+    </v-main>
+  </div>
 </template>
 
 <script lang="ts" setup>
-  import DefaultView from './View.vue'
+import Menubar from 'primevue/menubar'
 </script>
