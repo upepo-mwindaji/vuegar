@@ -86,7 +86,7 @@
           </p>
 
           <div 
-          v-if="!!accounts && !!segments"
+          v-if="!!accounts && !!segments && !!availableDimensions && !!availableMetrics"
           class="formgrid grid"
           >
 
@@ -179,7 +179,7 @@
         </template>
         <template #footer>
           <Button 
-          v-if="!accounts || !segments"
+          v-if="!accounts || !segments || !availableDimensions || !availableMetrics"
           @click="startReport" 
           :loading="loading.metadata || loading.accounts || loading.segments"
           :disabled="!isInitialized"
@@ -187,7 +187,7 @@
             TRY IT
           </Button>
           <Button 
-          v-if="!!accounts && !!segments"
+          v-if="!!accounts && !!segments && !!availableDimensions && !!availableMetrics"
           :disabled="!runnableReport"
           @click="getReport" 
           >
@@ -219,7 +219,7 @@
 
 <script lang="ts" setup>
 import { onBeforeMount, ref, computed } from 'vue'
-import { useVuegar } from '@/lib'
+import { useVuegar } from '../../dist/vuegar.js'
 import Menubar from 'primevue/menubar'
 import groupBy from 'lodash/groupBy'
 import Card from 'primevue/card'

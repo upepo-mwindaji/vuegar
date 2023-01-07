@@ -14,10 +14,10 @@
     }
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite serve demo",
     "build": "vue-tsc --noEmit && vite build",
     "build-only": "vite build",
-    "build:demo": "vite build -c vite.demo.config.js",
+    "build:demo": "vite build demo",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },

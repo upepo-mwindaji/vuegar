@@ -14,7 +14,7 @@ export default defineConfig({
   define: { 'process.env': {} },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('../src', import.meta.url))
     },
     extensions: [
       '.js',
@@ -29,11 +29,12 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  build: {
-    rollupOptions: {
-      output: {
-        dir: 'demo'
-      }
-    },
-  },
+  // build: {
+    // outDir: 'dist'
+    // rollupOptions: {
+    //   output: {
+    //     dir: 'demo-dist'
+    //   }
+    // },
+  // },
 })

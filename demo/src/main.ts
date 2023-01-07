@@ -1,10 +1,10 @@
-import Demo from './Demo.vue'
+import App from './App.vue'
 import { createApp } from 'vue'
 import PrimeVue from 'primevue/config'
 
-import '@/assets/main.css'
+import './assets/main.css'
 
-const app = createApp(Demo)
+const app = createApp(App)
 app.use(PrimeVue)
 
 app.mount('#app')

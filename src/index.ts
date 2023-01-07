@@ -1,7 +1,7 @@
 import { ref } from 'vue'
-import { Gapi } from './googleApi'
-import management from './managementApi'
-import { Report } from './reportingApi'
+import { Gapi } from './lib/googleApi'
+import management from './lib/managementApi'
+import { Report } from './lib/reportingApi'
 
 
 export function useVuegar (clientId) {
