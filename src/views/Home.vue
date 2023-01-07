@@ -50,16 +50,31 @@
 
           <div class="field col-12">
             <label class="block w-full" for="viewId">View ID</label>
-            <InputText id="viewId" type="text" v-model="viewId" />
+            <TreeSelect 
+            v-model="selectedView" 
+            :options="accountTree" 
+            placeholder="Select View" 
+            class="w-full">
+              <template #empty>
+                <Button
+                @click="getAccounts" 
+                color="primary"
+                outlined
+                >
+                  Get Views
+                </Button>
+              </template>
+            </TreeSelect>
+            <!-- <Breadcrumb v-if="selectedView" :home="home" :model="items" /> -->
           </div>
 
           <div class="field col-6">
             <label for="startDate">Start Date</label>
-            <InputText id="startDate" type="date" v-model="startDate" />
+            <Calendar id="startDate" type="date" v-model="selectedStartDate" />
           </div>
           <div class="field col-6">
             <label for="endDate">End Date</label>
-            <InputText id="endDate" type="date" v-model="endDate" />
+            <Calendar id="endDate" type="date" v-model="selectedEndDate" />
           </div>
 
           <span class="field col-12">
@@ -68,14 +83,24 @@
             id="dimensions"
             v-model="selectedDimensions" 
             :suggestions="filteredDimensions" 
-            @complete="searchItem($event)" 
+            @complete="searchDimensions($event)" 
             optionLabel="uiName" 
+            :dropdown="true"
+            class="w-full"
             />
           </span>
 
            <span class="field col-12">
             <label class="block w-full" for="metrics">Metrics</label>
-            <InputText id="metrics" label="Metrics"></InputText>
+            <AutoComplete 
+            id="metrics"
+            v-model="selectedMetrics" 
+            :suggestions="filteredMetrics" 
+            @complete="searchMetrics($event)" 
+            optionLabel="uiName" 
+            :dropdown="true"
+            class="w-full"
+            />
           </span>
 
           
@@ -101,27 +126,44 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, computed } from 'vue'
 import { useVuegar } from '@/lib'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import AutoComplete from 'primevue/autocomplete'
+import TreeSelect from 'primevue/treeselect'
+import Calendar from 'primevue/calendar'
+import Breadcrumb from 'primevue/breadcrumb'
 
 const clientId = import.meta.env.VITE_CLIENT_ID
 const vuegar = useVuegar(clientId)
 
 const data = ref(null)
+const accounts = ref(null)
+const segments = ref(null)
+const formEntries = ref(null)
 
+const selectedView = ref(null)
+const selectedStartDate = ref(null)
+const selectedEndDate = ref(null)
 const selectedDimensions = ref([])
 const selectedMetrics = ref([])
 let availableDimensions
+let availableMetrics
 
-const availableMetrics = ref([])
 const filteredDimensions = ref([])
+const filteredMetrics = ref([])
 
-const searchItem = (event) => {
+const searchDimensions = (event) => {
   filteredDimensions.value = availableDimensions.filter((item) => {
+    const uiName = item.uiName.toLowerCase()
+    return uiName.indexOf(event.query.toLowerCase()) > -1
+  })
+}
+
+const searchMetrics = (event) => {
+  filteredMetrics.value = availableMetrics.filter((item) => {
     const uiName = item.uiName.toLowerCase()
     return uiName.indexOf(event.query.toLowerCase()) > -1
   })
@@ -138,7 +180,7 @@ onBeforeMount(async()=>{
   await vuegar.init() // this can be delayed if needed
   const metadata = await vuegar.getMetadata()
   availableDimensions = metadata.filter((item) => item.type === 'DIMENSION')
-  // availableMetrics.value = metadata.filter((item) => item.type === 'METRIC')
+  availableMetrics = metadata.filter((item) => item.type === 'METRIC')
   // console.log(metadata)
 })
 
@@ -159,14 +201,40 @@ const getReport = async () => {
 }
 
 const getAccounts = async () => {
-  const accounts = await vuegar.getAccounts() 
-  data.value = accounts   
+  accounts.value = await vuegar.getAccounts() 
 }
 
 const getSegments = async () => {
-  const accounts = await vuegar.getSegments() 
-  data.value = accounts   
+  segments.value = await vuegar.getSegments() 
 }
+
+
+const accountTree = computed(() => {
+  if (!accounts.value) return null
+  return accounts.value.map((account) => {
+    return {
+      key: account.id,
+      label: account.name,
+      data: account.id,
+      selectable: !account.properties.length,
+      children: !account.properties.length ? null : account.properties.map((property) => {
+        return {
+          key: property.id,
+          label: property.name,
+          selectable: false,
+          children: property.views.map((view) => {
+            return {
+              key: view.id,
+              label: view.name,
+              data: view.id,
+              selectable: true
+            }
+          })
+        }
+      })
+    }
+  })
+})
 
 
 </script>
