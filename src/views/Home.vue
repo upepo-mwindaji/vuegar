@@ -103,6 +103,20 @@
             />
           </span>
 
+          <span class="field col-12">
+            <label class="block w-full" for="metrics">Segments</label>
+            <AutoComplete 
+            id="segments"
+            v-model="selectedSegments" 
+            :suggestions="filteredSegments" 
+            @complete="searchSegments($event)" 
+            optionLabel="name" 
+            :dropdown="true"
+            class="w-full"
+            >
+            </AutoComplete>
+          </span>
+
           
         </div>
 
@@ -149,11 +163,13 @@ const selectedStartDate = ref(null)
 const selectedEndDate = ref(null)
 const selectedDimensions = ref([])
 const selectedMetrics = ref([])
+const selectedSegments = ref([])
 let availableDimensions
 let availableMetrics
 
 const filteredDimensions = ref([])
 const filteredMetrics = ref([])
+const filteredSegments = ref([])
 
 const searchDimensions = (event) => {
   filteredDimensions.value = availableDimensions.filter((item) => {
@@ -167,6 +183,17 @@ const searchMetrics = (event) => {
     const uiName = item.uiName.toLowerCase()
     return uiName.indexOf(event.query.toLowerCase()) > -1
   })
+}
+
+const searchSegments = (event) => {
+  if (!segments.value) {
+    getSegments()
+  } else {
+    filteredSegments.value = segments.value.filter((item) => {
+      const name = item.name.toLowerCase()
+      return name.indexOf(event.query.toLowerCase()) > -1
+    })
+  }
 }
 
 const customFilter = (value, query, item) => {
