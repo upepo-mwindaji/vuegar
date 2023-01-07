@@ -46,15 +46,26 @@
         Use `vuegar.getData()` to get data. This will return data, dimensions, metrics
         </p>
 
-        <div class="formgrid grid">
+        <div 
+        v-if="!!accounts && !!segments"
+        class="formgrid grid"
+        >
 
           <div class="field col-12">
             <label class="block w-full" for="viewId">View ID</label>
             <TreeSelect 
-            v-model="selectedView" 
+            :modelValue="{ [selectedView]: true}"
+            @change="updateViewId"
             :options="accountTree" 
+            selectionMode="single"
             placeholder="Select View" 
             class="w-full">
+              <template #value="{value}">
+              <div>{{ (!value || !value.length) ? '' : value[0].key }}</div>
+              <div class="text-xs">
+                {{ (!value || !value.length) ? '' : `${value[0].data.account.name} > ${value[0].data.property.name} > ${value[0].data.view.name}` }}
+                </div>
+              </template>
               <template #empty>
                 <Button
                 @click="getAccounts" 
@@ -85,6 +96,9 @@
             :suggestions="filteredDimensions" 
             @complete="searchDimensions($event)" 
             optionLabel="uiName" 
+            optionGroupLabel="name" 
+            optionGroupChildren="items"
+            :multiple="true"
             :dropdown="true"
             class="w-full"
             />
@@ -98,6 +112,9 @@
             :suggestions="filteredMetrics" 
             @complete="searchMetrics($event)" 
             optionLabel="uiName" 
+            optionGroupLabel="name" 
+            optionGroupChildren="items"
+            :multiple="true"
             :dropdown="true"
             class="w-full"
             />
@@ -125,6 +142,16 @@
       </template>
       <template #footer>
         <Button 
+        v-if="!accounts || !segments"
+        @click="startReport" 
+        color="primary"
+        outlined
+        rounded 
+        >
+          TRY IT
+        </Button>
+        <Button 
+        v-if="!!accounts && !!segments"
         @click="getReport" 
         color="primary"
         outlined
@@ -142,6 +169,7 @@
 <script lang="ts" setup>
 import { onBeforeMount, ref, computed } from 'vue'
 import { useVuegar } from '@/lib'
+import groupBy from 'lodash/groupBy'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -153,10 +181,10 @@ import Breadcrumb from 'primevue/breadcrumb'
 const clientId = import.meta.env.VITE_CLIENT_ID
 const vuegar = useVuegar(clientId)
 
-const data = ref(null)
 const accounts = ref(null)
 const segments = ref(null)
-const formEntries = ref(null)
+const availableDimensions = ref(null)
+const availableMetrics = ref(null)
 
 const selectedView = ref(null)
 const selectedStartDate = ref(null)
@@ -164,68 +192,12 @@ const selectedEndDate = ref(null)
 const selectedDimensions = ref([])
 const selectedMetrics = ref([])
 const selectedSegments = ref([])
-let availableDimensions
-let availableMetrics
 
 const filteredDimensions = ref([])
 const filteredMetrics = ref([])
 const filteredSegments = ref([])
 
-const searchDimensions = (event) => {
-  filteredDimensions.value = availableDimensions.filter((item) => {
-    const uiName = item.uiName.toLowerCase()
-    return uiName.indexOf(event.query.toLowerCase()) > -1
-  })
-}
-
-const searchMetrics = (event) => {
-  filteredMetrics.value = availableMetrics.filter((item) => {
-    const uiName = item.uiName.toLowerCase()
-    return uiName.indexOf(event.query.toLowerCase()) > -1
-  })
-}
-
-const searchSegments = (event) => {
-  if (!segments.value) {
-    getSegments()
-  } else {
-    filteredSegments.value = segments.value.filter((item) => {
-      const name = item.name.toLowerCase()
-      return name.indexOf(event.query.toLowerCase()) > -1
-    })
-  }
-}
-
-const customFilter = (value, query, item) => {
-  const textOne = value.toLowerCase()
-  const searchText = query.toLowerCase()
-
-  return textOne.indexOf(searchText) > -1
-}
-
-onBeforeMount(async()=>{
-  await vuegar.init() // this can be delayed if needed
-  const metadata = await vuegar.getMetadata()
-  availableDimensions = metadata.filter((item) => item.type === 'DIMENSION')
-  availableMetrics = metadata.filter((item) => item.type === 'METRIC')
-  // console.log(metadata)
-})
-
-const getReport = async () => {
-  try {
-    data.value = await vuegar.getData([{
-      viewId: "172634282",
-      dateStart: '2022-01-01',
-      dateEnd: '2022-12-31',
-      dimensions: ['ga:pagePath'],
-      metrics: ['ga:sessions'],
-      segments: [],
-      filters: [],
-    }])
-  } catch(e) {
-    console.log(e)
-  }
-}
+const data = ref(null)
 
 const getAccounts = async () => {
   accounts.value = await vuegar.getAccounts() 
@@ -235,6 +207,41 @@ const getSegments = async () => {
   segments.value = await vuegar.getSegments() 
 }
 
+const groupDimensions = computed(() => {
+  const obj = groupBy(availableDimensions.value, (dimension) => {
+    return dimension.group
+  })
+  return Object.keys(obj).map((group) => {
+    return {
+      name: group, 
+      items: obj[group]
+    }
+  })
+})
+
+const getReport = async () => {
+  try {
+    data.value = await vuegar.getData([{
+      viewId: selectedView,
+      dateStart: selectedStartDate.toISOString().split('T')[0],
+      dateEnd: selectedEndDate.toISOString().split('T')[0],
+      dimensions: selectedDimensions,
+      metrics: selectedMetrics,
+      segments: selectedSegments,
+      filters: [],
+    }])
+  } catch(e) {
+    console.log(e)
+  }
+}
+
+const startReport = async () => {
+  const metadata = await vuegar.getMetadata()
+  availableDimensions.value = metadata.filter((item) => item.type === 'DIMENSION')
+  availableMetrics.value = metadata.filter((item) => item.type === 'METRIC')
+  await getAccounts()
+  await getSegments()
+}
 
 const accountTree = computed(() => {
   if (!accounts.value) return null
@@ -242,7 +249,7 @@ const accountTree = computed(() => {
     return {
       key: account.id,
       label: account.name,
-      data: account.id,
+      data: { account },
       selectable: !account.properties.length,
       children: !account.properties.length ? null : account.properties.map((property) => {
         return {
@@ -253,7 +260,7 @@ const accountTree = computed(() => {
             return {
               key: view.id,
               label: view.name,
-              data: view.id,
+              data: { account, property, view },
               selectable: true
             }
           })
@@ -263,5 +270,51 @@ const accountTree = computed(() => {
   })
 })
 
+const updateViewId = (keys) => {
+  selectedView.value = Object.keys(keys)[0]
+}
+
+const searchDimensions = (event) => {
+  const filtered = availableDimensions.value.filter((item) => {
+    const uiName = item.uiName.toLowerCase()
+    return uiName.indexOf(event.query.toLowerCase()) > -1
+  })
+  const obj = groupBy(filtered, (dimension) => {
+    return dimension.group
+  })
+  filteredDimensions.value = Object.keys(obj).map((group) => {
+    return {
+      name: group, 
+      items: obj[group]
+    }
+  })
+}
+
+const searchMetrics = (event) => {
+  const filtered = availableMetrics.value.filter((item) => {
+    const uiName = item.uiName.toLowerCase()
+    return uiName.indexOf(event.query.toLowerCase()) > -1
+  })
+  const obj = groupBy(filtered, (dimension) => {
+    return dimension.group
+  })
+  filteredMetrics.value = Object.keys(obj).map((group) => {
+    return {
+      name: group, 
+      items: obj[group]
+    }
+  })
+}
+
+const searchSegments = (event) => {
+  filteredSegments.value = segments.value.filter((item) => {
+    const name = item.name.toLowerCase()
+    return name.indexOf(event.query.toLowerCase()) > -1
+  })
+}
+
+onBeforeMount(async()=>{
+  await vuegar.init() // this can be delayed if needed
+})
 
 </script>
