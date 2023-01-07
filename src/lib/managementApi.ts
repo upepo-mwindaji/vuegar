@@ -1,4 +1,3 @@
-import _ from 'lodash'
 class Management {
 
     // get all accessible accounts then parse in a tree (json)
@@ -39,7 +38,6 @@ class Management {
         })
         return accountObj
       })
-      console.log('account tree is updated')
       return accountsTree
     }
 
@@ -51,10 +49,9 @@ class Management {
 
 
     parseSegments(rawSegments) {
-      const segments = rawSegments.result.items.map((segment) => {
-        return _.pick(segment,['name','segmentId','type','definition'])
+      const segments = rawSegments.result.items.map(({ name, segmentId, type, definition }) => {
+        return { name, segmentId, type, definition }
       })
-      console.log('segment list is updated')
       return segments
     }
 
@@ -125,7 +122,6 @@ class Management {
           })
         }
         const response = await runbatch()
-        console.log(response)
         return {
             accountsTree: this.parseAccountTree(response.result.accounts),
             segments: this.parseSegments(response.result.segments),

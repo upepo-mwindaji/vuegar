@@ -7,20 +7,11 @@ class Gapi {
     async loadGis() {
         await this.loadScript('https://accounts.google.com/gsi/client')
         await this.waitForLib('google')
-        console.log('gis loaded')
-        // check if promise needed
-        // tokenClient.value = google.accounts.oauth2.initTokenClient({
-        //     client_id: clientId,
-        //     scope: 'https://www.googleapis.com/auth/analytics.readonly',
-        //     prompt: 'consent',
-        //     callback: '',  // defined at request time in await/promise scope.
-        // })
     }
 
     async loadGapi() {
       await this.loadScript('https://apis.google.com/js/api.js')
       await this.waitForLib('gapi')
-      console.log('gapi loaded')
     }
 
     async loadGar() {
@@ -31,7 +22,6 @@ class Gapi {
         await window.gapi.client.init({})
         await window.gapi.client.load('https://www.googleapis.com/discovery/v1/apis/analytics/v3/rest')
         await window.gapi.client.load('https://analyticsreporting.googleapis.com/$discovery/rest')
-        console.log('gar loaded')
     }
 
     
@@ -80,9 +70,9 @@ class Gapi {
     }
 
     getToken() {
-      console.log('client_id: ',this.clientId)
       return new Promise ((resolve, reject) => {
         try {
+          if (!this.clientId) throw new Error ('missing client id')
           const tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: this.clientId,
             scope: 'https://www.googleapis.com/auth/analytics.readonly',

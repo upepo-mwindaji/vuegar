@@ -18,21 +18,16 @@ export function useVuegar (clientId) {
     const getData = async (params) => {
         try {
             const metadata = await management.getMetadata()
-            // console.log(metadata)
             const report = new Report()
-            // console.log('getting raw data')
             const rawData = await report.getData(params)
             const cleanData = report.parseData(rawData, metadata)
             return cleanData
         } catch (e) {
-            // console.log(e)
             if ((e.result?.error?.code == 401 || e.result?.error?.code == 403) &&
             (e.result?.error?.status == "PERMISSION_DENIED" || e.result?.error?.status == "UNAUTHENTICATED")) {
                 const tokenResponse = await gapi.getToken()
-                // console.log('tokenresponse', tokenResponse)
                 return getData(params)
             } else {
-                console.log('other error')
                 console.log(e)
             }
         }
@@ -43,15 +38,11 @@ export function useVuegar (clientId) {
             const accounts = await management.getAccounts()
             return accounts
         } catch (e) {
-            // console.log(e)
             if ((e.result?.error?.code == 401 || e.result?.error?.code == 403) &&
             (e.result?.error?.status == "PERMISSION_DENIED" || e.result?.error?.status == "UNAUTHENTICATED")) {
                 const tokenResponse = await gapi.getToken()
-                // console.log('tokenresponse', tokenResponse)
-                // console.log(accounts)
                 return getAccounts()
             } else {
-                console.log('other error')
                 console.log(e)
             }
         }
@@ -62,15 +53,11 @@ export function useVuegar (clientId) {
             const segments = await management.getSegments()
             return segments
         } catch (e) {
-            // console.log(e)
             if ((e.result?.error?.code == 401 || e.result?.error?.code == 403) &&
             (e.result?.error?.status == "PERMISSION_DENIED" || e.result?.error?.status == "UNAUTHENTICATED")) {
                 const tokenResponse = await gapi.getToken()
-                // console.log('tokenresponse', tokenResponse)
-                // console.log(accounts)
                 return getSegments()
             } else {
-                console.log('other error')
                 console.log(e)
             }
         }
@@ -81,7 +68,6 @@ export function useVuegar (clientId) {
             const metadata = await management.getMetadata()
             return metadata
         } catch (e) {
-            console.log('other error')
             console.log(e)
         }
     }

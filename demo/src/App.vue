@@ -165,6 +165,7 @@
               :suggestions="filteredSegments" 
               @complete="searchSegments($event)" 
               optionLabel="name" 
+              :multiple="true"
               :dropdown="true"
               class="w-full"
               >
@@ -219,7 +220,7 @@
 
 <script lang="ts" setup>
 import { onBeforeMount, ref, computed } from 'vue'
-import { useVuegar } from '../../dist/vuegar.js'
+import { useVuegar } from '@/index'
 import Menubar from 'primevue/menubar'
 import groupBy from 'lodash/groupBy'
 import Card from 'primevue/card'

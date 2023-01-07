@@ -1,5 +1,3 @@
-import _ from "lodash"
-
 class Report {
 
   // paramsInput = [
@@ -17,7 +15,7 @@ class Report {
   buildRequest(paramsInput) {
     const request = {}
     request.params = paramsInput
-    if (!_.isArray(paramsInput)) {
+    if (!Array.isArray(paramsInput)) {
       request.params = [paramsInput]
     }
 
@@ -36,43 +34,42 @@ class Report {
     };
 
     request.params.forEach((param, index) => {
-      console.log(param)
       request.json.reportRequests[index].dimensions = param.dimensions.map(
         (dimension) => {
-          if (_.isObject(dimension)) {
+          if (typeof dimension === 'object' && dimension.hasOwnProperty('id')) {
             return { name: dimension.id };
           }
-          if (_.isString(dimension)) {
+          if (typeof dimension === 'string') {
             return { name: dimension };
           }
         }
       );
       request.json.reportRequests[index].metrics = param.metrics.map(
         (metric) => {
-          if (_.isObject(metric)) {
+          if (typeof metric === 'object' && metric.hasOwnProperty('id')) {
             return { expression: metric.id };
           }
-          if (_.isString(metric)) {
+          if (typeof metric === 'string') {
             return { expression: metric };
           }
         }
       );
-      if (!_.isEmpty(param.segments)) {
+      if (param.segments && Array.isArray(param.segments) && param.segments.length) {
         request.json.reportRequests[index].dimensions.push({
           name: "ga:segment",
         });
         request.json.reportRequests[index].segments = param.segments.map(
           (segment) => {
-            if (_.isObject(segment)) {
+            if (typeof segment === 'object' && segment.hasOwnProperty('segmentId')) {
               return { segmentId: segment.segmentId };
             }
-            if (_.isString(segment)) {
+            if (typeof segment === 'string') {
               return { segmentId: segment };
             }
           }
         );
       }
-      if (!_.isEmpty(param.filters)) {
+      if (param.filters && Array.isArray(param.filters) && param.filters.length) {
         request.json.reportRequests[index].dimensionFilterClauses =
           param.filters.map((filter) => {
             return {
@@ -90,8 +87,7 @@ class Report {
   }
 
   parseData(rawdata, metametadata) {
-    console.log('inputdata',rawdata)
-    if (_.isUndefined(rawdata)){
+    if (typeof rawdata === 'undefined'){
       // check if any reference to parsedData is kept
       return null
     }
@@ -131,18 +127,12 @@ class Report {
 
         // parse dimensions in array
         dimensions : dimensionHeaders.map((dimension) => {
-          const items = []
           let metadata = {}
-          rows.forEach((row) => {
-            if (items.indexOf(row[dimension])===-1){
-              items.push(row[dimension])
-            }
-          })
           if (dimension === 'ga:segment'){
             metadata = {
               'id': 'ga:segment',
               'dataType': 'STRING',
-              'description': 'A segment',
+              'description': 'segment',
               'group': 'Segment',
               'type': 'SEGMENT',
               'uiName': 'Segment'
@@ -155,7 +145,6 @@ class Report {
           return {
             name: metadata.uiName,
             metadata: metadata,
-            items: items
           }
         }),
 
@@ -168,18 +157,7 @@ class Report {
             name: metadata.uiName,
             metadata: metadata
           }
-        }),
-
-        segments : (() => {
-          const items = []
-          rows.forEach((row) => {
-            if (items.indexOf(row['ga:segment'])===-1){
-              items.push(row['ga:segment'])
-            }
-          })
-          return items
-        })()
-
+        })
       }
     })
     return reports
@@ -188,9 +166,7 @@ class Report {
   async getData(params) {
       // Call the Analytics Reporting API V4 batchGet method.
       const jsonRequest = this.buildRequest(params)
-      console.log('make request')
       const response = await window.gapi.client.analyticsreporting.reports.batchGet(jsonRequest)
-      console.log("request successfull")
       return response.result.reports
   }
 }
