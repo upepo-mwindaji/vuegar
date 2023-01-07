@@ -14,6 +14,7 @@
           <Button 
           @click="getAccounts" 
           v-if="!accounts"
+          :loading="loading.accounts"
           >
             RUN
           </Button>
@@ -43,6 +44,7 @@
         <Button 
         @click="getSegments" 
         v-if="!segments"
+        :loading="loading.segments"
         >
           RUN
         </Button>
@@ -167,19 +169,35 @@
         <Button 
         v-if="!accounts || !segments"
         @click="startReport" 
+        :loading="loading.metadata || loading.accounts || loading.segments"
         >
           TRY IT
         </Button>
         <Button 
         v-if="!!accounts && !!segments"
+        :disabled="!runnableReport"
         @click="getReport" 
         >
           RUN
         </Button>
+        <Button 
+        @click="showData = true" 
+        v-if="data"
+        class="p-button-success ml-2"
+        >
+          SHOW
+        </Button>
       </template>
     </Card>
+
+    <Dialog 
+    header="Data" 
+    v-model:visible="showData" 
+    class="w-full md:w-6 px-1"
+    >
+      <pre>{{ data }}</pre>
+    </Dialog>
     
-    <pre> {{ data }} </pre>
   </div>
 </template>
 
@@ -216,30 +234,25 @@ const filteredSegments = ref([])
 
 const data = ref(null)
 
+const loading = ref({})
 const showAccounts = ref(false)
 const showSegments = ref(false)
+const showData = ref(false)
 
 const getAccounts = async () => {
+  loading.value = { accounts: true }
   accounts.value = await vuegar.getAccounts() 
+  loading.value = {}
 }
 
 const getSegments = async () => {
+  loading.value = { segments: true }
   segments.value = await vuegar.getSegments() 
+  loading.value = {}
 }
 
-const groupDimensions = computed(() => {
-  const obj = groupBy(availableDimensions.value, (dimension) => {
-    return dimension.group
-  })
-  return Object.keys(obj).map((group) => {
-    return {
-      name: group, 
-      items: obj[group]
-    }
-  })
-})
-
 const getReport = async () => {
+  loading.value = { report: true }
   try {
     data.value = await vuegar.getData([{
       viewId: selectedView.value,
@@ -252,16 +265,24 @@ const getReport = async () => {
     }])
   } catch(e) {
     console.log(e)
+  } finally {
+    loading.value = {}
   }
 }
 
 const startReport = async () => {
+  loading.value = { metadata: true }
   const metadata = await vuegar.getMetadata()
   availableDimensions.value = metadata.filter((item) => item.type === 'DIMENSION')
   availableMetrics.value = metadata.filter((item) => item.type === 'METRIC')
+  loading.value = {}
   await getAccounts()
   await getSegments()
 }
+
+const runnableReport = computed(() => {
+  return !!selectedView.value && !!selectedStartDate.value && !!selectedEndDate.value && !!selectedMetrics.value.length
+})
 
 const accountTree = computed(() => {
   if (!accounts.value) return null
