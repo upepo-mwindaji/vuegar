@@ -11,16 +11,28 @@
         Use `vuegar.getAccounts()` to get a tree of accounts, properties, views
       </template>
       <template #footer>
-        <Button 
-        @click="getAccounts" 
-        color="primary"
-        outlined
-        rounded 
-        >
-          RUN
-        </Button>
+          <Button 
+          @click="getAccounts" 
+          v-if="!accounts"
+          >
+            RUN
+          </Button>
+          <Button 
+          @click="showAccounts = true" 
+          v-if="accounts"
+          class="p-button-success"
+          >
+            SHOW
+          </Button>
       </template>
     </Card>
+    <Dialog 
+    header="Accounts" 
+    v-model:visible="showAccounts" 
+    class="w-full md:w-6 px-1"
+    >
+      <pre>{{ accounts }}</pre>
+    </Dialog>
 
     <Card class="my-4 mx-2 md:mx-auto md:max-w-30rem">
       <template #title> Segments </template>
@@ -30,14 +42,27 @@
       <template #footer>
         <Button 
         @click="getSegments" 
-        color="primary"
-        outlined
-        rounded 
+        v-if="!segments"
         >
           RUN
         </Button>
+        <Button 
+        @click="showSegments = true" 
+        v-if="segments"
+        class="p-button-success"
+        >
+          SHOW
+        </Button>
       </template>
     </Card>
+
+    <Dialog 
+    header="Segments" 
+    v-model:visible="showSegments" 
+    class="w-full md:w-6 px-1"
+    >
+      <pre>{{ segments }}</pre>
+    </Dialog>
 
     <Card class="my-4 mx-2 md:mx-auto md:max-w-30rem">
       <template #title> Report </template>
@@ -69,8 +94,6 @@
               <template #empty>
                 <Button
                 @click="getAccounts" 
-                color="primary"
-                outlined
                 >
                   Get Views
                 </Button>
@@ -144,18 +167,12 @@
         <Button 
         v-if="!accounts || !segments"
         @click="startReport" 
-        color="primary"
-        outlined
-        rounded 
         >
           TRY IT
         </Button>
         <Button 
         v-if="!!accounts && !!segments"
         @click="getReport" 
-        color="primary"
-        outlined
-        rounded 
         >
           RUN
         </Button>
@@ -176,7 +193,7 @@ import InputText from 'primevue/inputtext'
 import AutoComplete from 'primevue/autocomplete'
 import TreeSelect from 'primevue/treeselect'
 import Calendar from 'primevue/calendar'
-import Breadcrumb from 'primevue/breadcrumb'
+import Dialog from 'primevue/dialog'
 
 const clientId = import.meta.env.VITE_CLIENT_ID
 const vuegar = useVuegar(clientId)
@@ -198,6 +215,9 @@ const filteredMetrics = ref([])
 const filteredSegments = ref([])
 
 const data = ref(null)
+
+const showAccounts = ref(false)
+const showSegments = ref(false)
 
 const getAccounts = async () => {
   accounts.value = await vuegar.getAccounts() 
@@ -222,12 +242,12 @@ const groupDimensions = computed(() => {
 const getReport = async () => {
   try {
     data.value = await vuegar.getData([{
-      viewId: selectedView,
-      dateStart: selectedStartDate.toISOString().split('T')[0],
-      dateEnd: selectedEndDate.toISOString().split('T')[0],
-      dimensions: selectedDimensions,
-      metrics: selectedMetrics,
-      segments: selectedSegments,
+      viewId: selectedView.value,
+      dateStart: selectedStartDate.value.toISOString().split('T')[0],
+      dateEnd: selectedEndDate.value.toISOString().split('T')[0],
+      dimensions: selectedDimensions.value,
+      metrics: selectedMetrics.value,
+      segments: selectedSegments.value,
       filters: [],
     }])
   } catch(e) {
