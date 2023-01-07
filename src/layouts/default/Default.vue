@@ -1,16 +1,16 @@
 <template>
   <div style="font-family: Roboto;">
     <header>
-      <Menubar class="bg-primary" :model="items">
+      <Menubar class="bg-primary">
         <template #start> VUEBAR DEMO </template>
         <template #end>
           <i class="pi pi-github"></i>
         </template>
       </Menubar>
     </header>
-    <v-main>
+    <main>
       <router-view />
-    </v-main>
+    </main>
   </div>
 </template>
 
