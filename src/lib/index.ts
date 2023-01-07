@@ -8,10 +8,11 @@ export function useVuegar (clientId) {
 
     const gapi = new Gapi(clientId)
     
-    const showButton = ref(false)
+    const isInitialized = ref(false)
 
     const init = async () => {
         await gapi.init()
+        isInitialized.value = true
     }
     
     const getData = async (params) => {
@@ -87,7 +88,7 @@ export function useVuegar (clientId) {
 
     return {
         init,
-        showButton,
+        isInitialized,
         getAccounts,
         getSegments,
         getMetadata,

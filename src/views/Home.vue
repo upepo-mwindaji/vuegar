@@ -4,7 +4,7 @@
       <h1 class="text-2xl"> Demo </h1>
       <p class="text-base"> Simple demo of the vuegar library </p>
     </div>
-  
+
     <Card class="my-4 mx-2 md:mx-auto md:max-w-30rem">
       <template #title> Accounts </template>
       <template #content>
@@ -15,6 +15,7 @@
           @click="getAccounts" 
           v-if="!accounts"
           :loading="loading.accounts"
+          :disabled="!isInitialized"
           >
             RUN
           </Button>
@@ -45,6 +46,7 @@
         @click="getSegments" 
         v-if="!segments"
         :loading="loading.segments"
+        :disabled="!isInitialized"
         >
           RUN
         </Button>
@@ -57,7 +59,6 @@
         </Button>
       </template>
     </Card>
-
     <Dialog 
     header="Segments" 
     v-model:visible="showSegments" 
@@ -129,7 +130,7 @@
             />
           </span>
 
-           <span class="field col-12">
+          <span class="field col-12">
             <label class="block w-full" for="metrics">Metrics</label>
             <AutoComplete 
             id="metrics"
@@ -170,6 +171,7 @@
         v-if="!accounts || !segments"
         @click="startReport" 
         :loading="loading.metadata || loading.accounts || loading.segments"
+        :disabled="!isInitialized"
         >
           TRY IT
         </Button>
@@ -189,7 +191,6 @@
         </Button>
       </template>
     </Card>
-
     <Dialog 
     header="Data" 
     v-model:visible="showData" 
@@ -198,6 +199,7 @@
       <pre>{{ data }}</pre>
     </Dialog>
     
+    <div class="h-3rem"></div>
   </div>
 </template>
 
@@ -212,9 +214,12 @@ import AutoComplete from 'primevue/autocomplete'
 import TreeSelect from 'primevue/treeselect'
 import Calendar from 'primevue/calendar'
 import Dialog from 'primevue/dialog'
+import ProgressSpinner from 'primevue/progressspinner'
 
 const clientId = import.meta.env.VITE_CLIENT_ID
 const vuegar = useVuegar(clientId)
+
+const { isInitialized } = vuegar
 
 const accounts = ref(null)
 const segments = ref(null)
@@ -355,7 +360,9 @@ const searchSegments = (event) => {
 }
 
 onBeforeMount(async()=>{
-  await vuegar.init() // this can be delayed if needed
+  if (!vuegar.isInitialized.value) {
+    await vuegar.init() // this can be delayed if needed
+  }
 })
 
 </script>
