@@ -38,7 +38,7 @@ class Gapi {
     loadScript(url) {
         if(window && document) {
             return new Promise((resolve, reject) => {
-
+                if (document.querySelector(`[src="${url}"]`)) return
                 const scriptTag = document.createElement('script')
                 scriptTag.type = 'text/javascript'
                 scriptTag.async = true
