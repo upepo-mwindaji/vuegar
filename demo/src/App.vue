@@ -24,7 +24,7 @@
           <InputText
           v-model="clientId"
           class="w-full mt-4 p-inputtext-sm"
-          :disabled="!clientId || isInitialized"
+          :disabled="isInitialized"
           placeholder="123456-abcdefg.apps.googleusercontent.com"
           />
         </template>
