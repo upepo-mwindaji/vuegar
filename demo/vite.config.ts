@@ -7,8 +7,9 @@ import { resolve } from 'path'
 import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  base: '/vuegar/',
+export default defineConfig(({ command }) => {
+  return {
+  base: command === 'serve' ? '' : '/vuegar/',
   plugins: [
     vue(),
   ],
@@ -30,4 +31,4 @@ export default defineConfig({
   server: {
     port: 3000,
   }
-})
+}})
