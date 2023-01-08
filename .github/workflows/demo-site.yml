@@ -20,6 +20,8 @@ jobs:
       - name: Run build 🔧 
         run: |
           yarn build:demo
+        env:
+          VITE_CLIENT_ID: ${{ secrets.VITE_CLIENT_ID }}
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
