@@ -1,7 +1,7 @@
 class Gapi {
 
     constructor (clientId) {
-      this.clientId = clientId
+      this.clientId = ''
     }
 
     async loadGis() {
@@ -63,7 +63,8 @@ class Gapi {
         })
     }
 
-    async init() {
+    async init(clientId) {
+      this.clientId = clientId
       await this.loadGapi()
       await this.loadGar()
       await this.loadGis()

@@ -4,14 +4,14 @@ import management from './lib/managementApi'
 import { Report } from './lib/reportingApi'
 
 
-export function useVuegar (clientId) {
+export function useVuegar () {
 
-    const gapi = new Gapi(clientId)
+    const gapi = new Gapi()
     
     const isInitialized = ref(false)
 
-    const init = async () => {
-        await gapi.init()
+    const init = async (clientId) => {
+        await gapi.init(clientId)
         isInitialized.value = true
     }
     

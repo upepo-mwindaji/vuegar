@@ -2,7 +2,7 @@
   <div style="font-family: Roboto;">
 
     <header class="bg-primary h-4rem px-4 flex align-items-center">
-        <div class="text-2xl"> VUEBAR DEMO </div>
+        <div class="text-2xl"> VUEGAR DEMO </div>
         <div class="flex-grow-1"></div>
         <a href="#">
           <i class="pi pi-github text-white text-2xl"></i>
@@ -17,9 +17,32 @@
       </div>
 
       <Card class="my-4 mx-2 md:mx-auto md:max-w-30rem">
+        <template #title> Initialization </template>
+        <template #content>
+          <span class="mb-2">Initialize the API client </span>
+          <pre class="mt-2 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.init(&lt;client id&gt;)</code></pre>
+          <InputText
+          v-model="clientId"
+          class="w-full mt-2 p-inputtext-sm"
+          placeholder="123456-abcdefg.apps.googleusercontent.com"
+          />
+        </template>
+        <template #footer>
+            <Button 
+            @click="init" 
+            :loading="loading.init"
+            :disabled="!clientId"
+            >
+              INIT
+            </Button>
+        </template>
+      </Card>
+
+      <Card class="my-4 mx-2 md:mx-auto md:max-w-30rem">
         <template #title> Accounts </template>
         <template #content>
-          Use `vuegar.getAccounts()` to get a tree of accounts, properties, views
+          <span class="mb-2"> Get the tree of UA accounts/properties/views and GA4 properties</span>
+          <pre class="mt-2 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getAccounts()</code></pre>
         </template>
         <template #footer>
             <Button 
@@ -50,7 +73,8 @@
       <Card class="my-4 mx-2 md:mx-auto md:max-w-30rem">
         <template #title> Segments </template>
         <template #content>
-          Use `vuegar.getSegments()` to get a list of segments of the user
+          <span class="mb-2">Get the list of segments </span>
+          <pre class="mt-2 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getSegments()</code></pre>
         </template>
         <template #footer>
           <Button 
@@ -81,10 +105,8 @@
       <Card class="my-4 mx-2 md:mx-auto md:max-w-30rem">
         <template #title> Report </template>
         <template #content>
-          <p class="mb-3">
-          Use `vuegar.getData()` to get data. This will return data, dimensions, metrics
-          </p>
-
+           <span class="mb-2">Get reporting data </span>
+          <pre class="mt-2 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getData()</code></pre>
           <div 
           v-if="!!accounts && !!segments && !!availableDimensions && !!availableMetrics"
           class="formgrid grid"
@@ -232,9 +254,9 @@ import Calendar from 'primevue/calendar'
 import Dialog from 'primevue/dialog'
 import ProgressSpinner from 'primevue/progressspinner'
 
-const clientId = import.meta.env.VITE_CLIENT_ID
-const vuegar = useVuegar(clientId)
+const vuegar = useVuegar()
 
+const clientId = ref(null)
 const { isInitialized } = vuegar
 
 const accounts = ref(null)
@@ -259,6 +281,12 @@ const loading = ref({})
 const showAccounts = ref(false)
 const showSegments = ref(false)
 const showData = ref(false)
+
+const init = async () => {
+  loading.value = { init: true }
+  await vuegar.init(clientId.value)
+  loading.value = {}
+}
 
 const getAccounts = async () => {
   loading.value = { accounts: true }
@@ -374,11 +402,5 @@ const searchSegments = (event) => {
     return name.indexOf(event.query.toLowerCase()) > -1
   })
 }
-
-onBeforeMount(async()=>{
-  if (!vuegar.isInitialized.value) {
-    await vuegar.init() // this can be delayed if needed
-  }
-})
 
 </script>
