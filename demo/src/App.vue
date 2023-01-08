@@ -19,11 +19,12 @@
       <Card class="my-4 mx-2 md:mx-auto md:max-w-30rem">
         <template #title> Initialization </template>
         <template #content>
-          <span class="mb-2">Initialize the API client </span>
-          <pre class="mt-2 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.init(&lt;client id&gt;)</code></pre>
+          <span class="mb-2 mt-4">Initialize the API client </span>
+          <pre class="mt-4 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.init(&lt;client id&gt;)</code></pre>
           <InputText
           v-model="clientId"
-          class="w-full mt-2 p-inputtext-sm"
+          class="w-full mt-4 p-inputtext-sm"
+          :disabled="!clientId || isInitialized"
           placeholder="123456-abcdefg.apps.googleusercontent.com"
           />
         </template>
@@ -31,7 +32,7 @@
             <Button 
             @click="init" 
             :loading="loading.init"
-            :disabled="!clientId"
+            :disabled="!clientId || isInitialized"
             >
               INIT
             </Button>
@@ -42,7 +43,7 @@
         <template #title> Accounts </template>
         <template #content>
           <span class="mb-2"> Get the tree of UA accounts/properties/views and GA4 properties</span>
-          <pre class="mt-2 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getAccounts()</code></pre>
+          <pre class="mt-4 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getAccounts()</code></pre>
         </template>
         <template #footer>
             <Button 
@@ -74,7 +75,7 @@
         <template #title> Segments </template>
         <template #content>
           <span class="mb-2">Get the list of segments </span>
-          <pre class="mt-2 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getSegments()</code></pre>
+          <pre class="mt-4 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getSegments()</code></pre>
         </template>
         <template #footer>
           <Button 
@@ -106,10 +107,10 @@
         <template #title> Report </template>
         <template #content>
            <span class="mb-2">Get reporting data </span>
-          <pre class="mt-2 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getData()</code></pre>
+          <pre class="mt-4 mb-2"><code class="surface-800 text-white px-2 py-2">vuegar.getData()</code></pre>
           <div 
           v-if="!!accounts && !!segments && !!availableDimensions && !!availableMetrics"
-          class="formgrid grid"
+          class="formgrid grid mt-4"
           >
 
             <div class="field col-12">
