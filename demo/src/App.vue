@@ -220,7 +220,7 @@
 
 <script lang="ts" setup>
 import { onBeforeMount, ref, computed } from 'vue'
-import { useVuegar } from '@/index'
+import { useVuegar } from '../../src/index'
 import Menubar from 'primevue/menubar'
 import groupBy from 'lodash/groupBy'
 import Card from 'primevue/card'
