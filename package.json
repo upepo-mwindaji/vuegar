@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "files": [
-    "dist"
+    "/dist"
   ],
   "main": "./dist/vuegar.umd.cjs",
   "module": "./dist/vuegar.js",
@@ -13,7 +13,11 @@
       "require": "./dist/vuegar.umd.cjs"
     }
   },
+  "publishConfig": {
+    "@upepo-mwindaji:registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
+    "test": "exit 0",
     "dev": "vite serve demo",
     "build": "vue-tsc --noEmit && vite build",
     "build-only": "vite build",
