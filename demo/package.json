@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "description": "demo site for vuegar library",
   "scripts": {
-    "dev": "vite serve demo",
-    "build": "vite build demo",
-    "preview": "vite preview demo",
+    "dev": "vite serve",
+    "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "author": "",
