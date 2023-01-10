@@ -1,6 +1,3 @@
-// Plugins
-import vue from '@vitejs/plugin-vue'
-
 // Utilities
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
@@ -10,9 +7,6 @@ import { fileURLToPath, URL } from 'node:url'
 export default defineConfig(({ command }) => {
   return {
   base: command === 'serve' ? '' : '/vuegar/',
-  plugins: [
-    vue(),
-  ],
   define: { 'process.env': {} },
   resolve: {
     alias: {
