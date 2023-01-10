@@ -19,8 +19,10 @@ jobs:
           dir: demo
 
       - name: Run build 🔧 
-        run: |
-          yarn build:demo
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: build
+          dir: demo
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
