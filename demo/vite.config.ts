@@ -11,7 +11,7 @@ export default defineConfig(({ command }) => {
   return {
   base: command === 'serve' ? '' : '/vuegar/',
   plugins: [
-    vue(),
+    vue()
   ],
   define: { 'process.env': {} },
   resolve: {

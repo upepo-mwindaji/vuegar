@@ -1,16 +1,22 @@
-name: Build Library
+name: Build and deploy Library
 on:
-  push:
-    branches:
-      - main
-permissions:
-  contents: write
+  release:
+    types: [created]
+
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://npm.pkg.github.com/
 
       - name: Run install
         uses: borales/actions-yarn@v4
@@ -20,4 +26,10 @@ jobs:
       - name: Run build 🔧 
         run: |
           yarn build-only
+
+      - name: Run Publish 
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
 

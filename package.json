@@ -1,9 +1,9 @@
 {
-  "name": "vuegar",
-  "version": "0.0.0",
+  "name": "@upepo-mwindaji/vuegar",
+  "version": "0.0.1",
   "type": "module",
   "files": [
-    "dist"
+    "/dist"
   ],
   "main": "./dist/vuegar.umd.cjs",
   "module": "./dist/vuegar.js",
@@ -12,6 +12,9 @@
       "import": "./dist/vuegar.js",
       "require": "./dist/vuegar.umd.cjs"
     }
+  },
+  "publishConfig": {
+    "@upepo-mwindaji:registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "test": "vitest",
